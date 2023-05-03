@@ -1,7 +1,18 @@
-const express = require('express')
+require("dotenv").config();
+const express = require("express");
+const cors = require("cors");
 const router = require('./routes/router')
+const middleware = require('./utils/middleware')
 
-const server = express()
-server.use("/", router)
+const app = express()
+const PORT = 3002
 
-module.exports = server
+app.listen(PORT, () => {
+    console.log(`Server listening on port ${PORT}`)
+})
+
+app.use(express.json())
+app.use(cors())
+app.use("/", router)
+app.use(middleware.errorHandler)
+

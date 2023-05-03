@@ -1,0 +1,12 @@
+POST http://localhost:3002/register/
+Content-Type: application/json
+
+{
+  "userInfo": {
+    "username": "turbo",
+    "password": "testi",
+    "email": "testi1213@testi.com",
+    "name": "Testi",
+    "lastname": "Käyttäjä"
+  }
+}
