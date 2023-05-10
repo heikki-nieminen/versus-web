@@ -80,13 +80,14 @@ export const darkTheme = createTheme({
                     WebkitBoxShadow: "0 0 0 100px #1E1E1E inset !important",
                     WebkitTextFillColor: "#FFFFFF"
                 }
-            }
+            },
         },
         MuiPaper: {
             defaultProps: {
                 elevation: 8
             }
-        }
+        },
     },
+
 })
 

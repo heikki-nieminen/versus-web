@@ -12,11 +12,14 @@ export const reducer = (state, action) => {
             return deepCopy
         }
         case "LOGIN_ADMIN": {
+            console.log("Logging in as admin")
+            deepCopy.loggedIn = true
             deepCopy.isAdmin = true
             return deepCopy
         }
         case "LOGOUT": {
             deepCopy.loggedIn = false
+            deepCopy.isAdmin = false
             return deepCopy
         }
         case "SET_USERDATA": {

@@ -14,7 +14,9 @@ import {AccessDenied} from "./pages/AccessDenied";
 import {Events} from "./pages/Events/Events";
 import {Router} from "./router/Router";
 import theme, {darkTheme, lightTheme} from "./theme";
-
+import {LocalizationProvider} from "@mui/x-date-pickers";
+import {AdapterDayjs} from "@mui/x-date-pickers/AdapterDayjs";
+import 'dayjs/locale/fi'
 
 export const App = (props) => {
     const [isInitialized, setIsInitialized] = useState(true)
@@ -30,8 +32,7 @@ export const App = (props) => {
                 let userData
                 try {
                     userData = await axios({
-                        method: "get",
-                        url: state.apiServer + 'verifyUserToken'
+                        method: "get", url: state.apiServer + 'verifyUserToken'
                     })
                     if (userData) {
                         dispatch({type: "LOGIN_USER"})
@@ -49,11 +50,11 @@ export const App = (props) => {
                 let userData
                 try {
                     userData = await axios({
-                        method: "get",
-                        url: state.apiServer + 'verifyAdminToken'
+                        method: "get", url: state.apiServer + 'verifyAdminToken'
                     })
                     if (userData) {
                         dispatch({type: "LOGIN_ADMIN"})
+                        dispatch({type: "SET_USERDATA", payload: {userInfo: {username: userData.data.username}}})
                     }
                 } catch (err) {
                     localStorage.removeItem('adminToken')
@@ -66,32 +67,27 @@ export const App = (props) => {
 
     }, [])
 
-    return (
-        <BrowserRouter>
-            {isInitialized ?
-                <Container>
-                    <Navigation/>
-                    <Container>
-                        <Router/>
-                    </Container>
-                </Container>
-                :
-                <Loading/>
-            }
-        </BrowserRouter>
-    )
+    return (<BrowserRouter>
+        {isInitialized ? <Container>
+            <Navigation/>
+            <Container>
+                <Router/>
+            </Container>
+        </Container> : <Loading/>}
+    </BrowserRouter>)
 }
 
 export const ContextWrapper = () => {
     return (<>
-            <Context>
+        <Context>
+            <LocalizationProvider dateAdapter={AdapterDayjs} adapterLocale={"fi"}>
                 <DarkThemeProvider>
                     <CssBaseline/>
                     <App/>
                 </DarkThemeProvider>
-            </Context>
-        </>
-    )
+            </LocalizationProvider>
+        </Context>
+    </>)
 }
 
 const DarkThemeProvider = ({children}) => {
@@ -114,13 +110,9 @@ const DarkThemeProvider = ({children}) => {
         theme = darkTheme
     }
 
-    return (<>{isInitialized ?
-        <ThemeProvider theme={theme}>
-            {children}
-        </ThemeProvider>
-        :
-        <></>
-    }
+    return (<>{isInitialized ? <ThemeProvider theme={theme}>
+        {children}
+    </ThemeProvider> : <></>}
     </>)
 }
 

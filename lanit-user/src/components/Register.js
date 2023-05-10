@@ -83,12 +83,12 @@ export const Register = (props) => {
         setUserData({...userData, ...changes, [e.target.name]: e.target.value})
     }
     const handleSubmit = async () => {
-        const checkInput = Object.values(userData).every(value =>{
+        const checkInput = Object.values(userData).every(value => {
             return !!value;
         })
-        if(checkInput){
+        if (checkInput) {
             let result
-            try{
+            try {
                 result = await axios({
                     method: 'post',
                     url: state.apiServer + 'register',
@@ -96,15 +96,14 @@ export const Register = (props) => {
                         userInfo: userData
                     }
                 })
-            if(result){
-                navigate('/verify-email')
-                setOpen(false)
+                if (result) {
+                    navigate('/verify-email')
+                    setOpen(false)
+                }
+            } catch (err) {
+                console.log("VIRHE: ", err)
             }
-            }catch(err){
-                console.log("VIRHE: ",err)
-            }
-        }
-        else{
+        } else {
             console.log("Jotain puuttuu")
         }
     }

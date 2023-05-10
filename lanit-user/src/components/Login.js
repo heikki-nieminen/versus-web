@@ -45,12 +45,19 @@ export const Login = (props) => {
                 }
             })
             if(result.data.correct === true) {
-                localStorage.setItem('userToken', result.data.token)
+                if(result.data.isAdmin){
+                    localStorage.setItem('adminToken', result.data.token)
+                    dispatch({"type": "LOGIN_ADMIN"})
+                }
+                else{
+                    localStorage.setItem('userToken', result.data.token)
+                    dispatch({"type": "LOGIN_USER"})
+                }
                 axios.defaults.headers.common['Authorization'] = `Token ${result.data.token}`
-                dispatch({"type": "LOGIN_USER"})
                 handleClose()
-                props.setIsLoggedIn(true)
-                navigate(`/${address}`)
+                if(address){
+                    navigate(`/${address}`)
+                }
             }
         } catch (err) {
             console.log("VIRHE: ",err)

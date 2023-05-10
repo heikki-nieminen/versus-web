@@ -41,15 +41,25 @@ const loginUser = async (username, password) => {
             const compare = await bcrypt.compare(password, hashedPassword)
             if (compare) {
                 if (result.rows[0].email_verified) {
-                    token = jwt.sign({
-                        id: result.rows[0].id,
-                        username: username,
-                        email: result.rows[0].email,
-                        name: result.rows[0].name,
-                        lastname: result.rows[0].lastname
-                    }, process.env.USERSECRET, {algorithm: "HS256", expiresIn: "30d"})
-                    console.log("Palataan")
-                    return ({error: false, data: token})
+                    if (result.rows[0].is_admin) {
+                        token = jwt.sign({
+                            id: result.rows[0].id,
+                            username: username,
+                            email: result.rows[0].email,
+                            name: result.rows[0].name,
+                            lastname: result.rows[0].lastname
+                        }, process.env.ADMINSECRET, {algorithm: "HS256", expiresIn: "30d"})
+                        return ({error: false, data: {token: token, isAdmin: true}})
+                    } else {
+                        token = jwt.sign({
+                            id: result.rows[0].id,
+                            username: username,
+                            email: result.rows[0].email,
+                            name: result.rows[0].name,
+                            lastname: result.rows[0].lastname
+                        }, process.env.USERSECRET, {algorithm: "HS256", expiresIn: "30d"})
+                        return ({error: false, data: {token: token, isAdmin: false}})
+                    }
                 } else {
                     return {notVerified: true}
                 }
@@ -66,15 +76,19 @@ const loginUser = async (username, password) => {
 const addEvent = async (event) => {
     const queryString = `
     INSERT INTO event
-    (name, description, start_time, end_time, max_participants, address, account_number)
-    VALUES ($1, $2, $3, $4, $5, $6, $7)
+    (name, description, start_time, end_time, max_participants, address, account_number, account_name, fee)
+    VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9)
     `
-    const parameters = [event.name, event.description, event.startTime, event.endTime, event.maxParticipants, event.address, event.accountNumber]
+    const parameters = [event.eventName, event.description, event.startTime, event.endTime, event.maxParticipants, event.address, event.accountNumber, event.accountName, event.fee]
     let result
     try {
         result = await db.query(queryString, parameters)
     } catch (err) {
+        console.log("ERROR:",err.message)
         return {error: true, message: err.error}
+    }
+    return {
+        error: false
     }
 }
 
@@ -97,7 +111,8 @@ const listEvents = async () => {
                 startTime: row.start_time,
                 endTime: row.end_time,
                 participants: row.participants,
-                maxParticipants: row.max_participants
+                maxParticipants: row.max_participants,
+                fee: row.fee
             }))
     }
 }
@@ -123,4 +138,4 @@ const verifyUser = async (userId) => {
 }
 
 
-module.exports = {registerUser, loginUser, verifyUser}
+module.exports = {registerUser, loginUser, verifyUser, addEvent, listEvents}

@@ -7,7 +7,8 @@ export const initialState = {
     loggedIn: false,
     testidata: "testidata",
     isLoading: false,
-    darkMode: false
+    darkMode: false,
+    isAdmin: false
 }
 
 export const Context = ({children}) => {

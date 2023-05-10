@@ -9,51 +9,52 @@ export const AuthRoute = ({ isProtected, isAdminRoute, ...rest }) => {
     const [isAuthenticated, setIsAuthenticated] = useState(false)
     const [isVerifyingToken, setIsVerifyingToken] = useState(true)
 
-
-    const verifyToken = async () => {
-        let token
-        if (isAdminRoute) {
-            token = localStorage.getItem('adminToken')
-        } else {
-            token = localStorage.getItem('userToken')
-        }
-        if (!token) {
-            setIsAuthenticated(false)
+    useEffect(() => {
+        const verifyToken = async () => {
+            let adminToken = localStorage.getItem('adminToken')
+            let userToken = localStorage.getItem('userToken')
+            let token
+            if (isAdminRoute || adminToken) {
+                token = adminToken
+            } else {
+                token = userToken
+            }
+            if (!token) {
+                console.log("Tokenia ei löytynyt")
+                setIsAuthenticated(false)
+                setIsVerifyingToken(false)
+                return false
+            }
+            console.log("token: ",token)
+            try {
+                const response = await axios({
+                    method: 'get',
+                    url: isAdminRoute ? state.apiServer + 'verifyAdminToken' : adminToken ? state.apiServer + 'verifyAdminToken' : state.apiServer + 'verifyUserToken',
+                    headers: {
+                        Authorization: `Token ${token}`
+                    }
+                })
+                setIsAuthenticated(true)
+            } catch (err) {
+                setIsAuthenticated(false)
+            }
             setIsVerifyingToken(false)
-            return
         }
-        try {
-            const response = await axios({
-                method: 'get',
-                url: isAdminRoute ? state.apiServer + 'verifyAdminToken' : state.apiServer + 'verifyUserToken',
-                headers: {
-                    Authorization: `Token ${token}`
-                }
-            })
-            setIsAuthenticated(true)
-        } catch (err) {
-            setIsAuthenticated(false)
-        }
-        setIsVerifyingToken(false)
-    }
-
-    useEffect(() => {
         verifyToken()
-    }, [isAdminRoute, state.apiServer])
-
-    useEffect(() => {
-        setIsAuthenticated(state.loggedIn)
-    }, [state.loggedIn])
+    }, [])
 
     if (!isProtected) {
+        console.log("Route isn't protected")
         return <Outlet />
     }
 
     if (isAuthenticated) {
+        console.log("User is authenticated")
         return <Outlet />
     }
 
     if (!isVerifyingToken && !isAuthenticated) {
+        console.log("User isn't authenticated")
         return <AccessDenied />
     }
 

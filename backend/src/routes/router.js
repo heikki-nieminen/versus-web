@@ -1,6 +1,6 @@
 const router = require('express').Router()
 const {auth} = require('../utils/authentication')
-const {registerUser, loginUser, verifyUser} = require("../queries/queries");
+const {registerUser, loginUser, verifyUser, addEvent, listEvents} = require("../queries/queries");
 const {hashPassword} = require('../utils/authentication')
 const {sendEmail} = require('../utils/email')
 
@@ -20,7 +20,7 @@ router.post('/login', async (req, res, next) => {
         return next({type: "notVerified"})
     }
 
-    return res.status(201).send({correct: true, token: loginUserResult.data})
+    return res.status(201).send({correct: true, token: loginUserResult.data.token, isAdmin: loginUserResult.data.isAdmin})
 })
 router.post('/register', async (req, res, next) => {
     let userInfo = req.body.userInfo
@@ -60,15 +60,22 @@ router.get('/testi', async (req, res) => {
     res.send("Testisivu")
 })
 
-router.post('/add_event/', auth.adminAuth, async (req, res) => {
+router.post('/add_event/', auth.adminAuth, async (req, res, next) => {
+    console.log("Adding new event:",req.body)
+    const addEventResult = await addEvent(req.body)
+    if(addEventResult.error){return next(addEventResult)}
 
+    return res.status(200).send({status: "ok"})
 })
 
-router.get('/events', auth.userAuth, async (req, res, next) => {
+router.get('/get_events', auth.userAuth, async (req, res, next) => {
+    const listEventsResult = await listEvents()
+    if(listEventsResult.error){ return next(listEventsResult)}
 
+    return res.status(200).send(listEventsResult.data).end()
 })
 
-router.get('/event/:id', auth.userAuth, async (req, res, next) => {
+router.get('/event/:id', auth.adminAuth ,auth.userAuth, async (req, res, next) => {
 
 })
 
