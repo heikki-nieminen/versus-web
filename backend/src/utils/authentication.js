@@ -17,18 +17,17 @@ const checkUserAndAdmin = async (req, res, next) => {
         let admin = null
         try {
             user = jwt.verify(token, process.env.USERSECRET)
+            req.user = user
         } catch (err) {
 
         }
         try {
             admin = jwt.verify(token, process.env.ADMINSECRET)
+            req.user = admin
         } catch (err) {
 
         }
-        console.log("users:", user)
-        console.log("admin:", admin)
         if (user || admin) {
-            req.user = user || admin
             next()
         } else {
             return res.status(403).json({error: 'Access denied'});
@@ -38,13 +37,25 @@ const checkUserAndAdmin = async (req, res, next) => {
     }
 }
 
+const checkAdmin = async (req, res, next) => {
+    try {
+        const token = await getTokenFromHeaders(req)
+        let admin = null
+        try {
+            admin = jwt.verify(token, process.env.ADMINSECRET)
+            req.user = admin
+            next()
+        } catch (err) {
+            return res.status(403).json({error: 'Access denied'});
+        }
+    } catch (err) {
+        return res.status(401).json({error: 'Unauthorized'});
+    }
+}
+
 const auth = {
     userAuth: checkUserAndAdmin,
-    adminAuth: expressjwt({
-        secret: process.env.ADMINSECRET,
-        algorithms: ["HS256"],
-        getToken: getTokenFromHeaders
-    })
+    adminAuth: checkAdmin
 }
 
 const hashPassword = async (plainPassword) => {

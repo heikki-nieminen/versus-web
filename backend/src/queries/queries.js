@@ -24,7 +24,6 @@ const registerUser = async (userInfo) => {
     console.log("result???", result)
     return {error: false, data: result.rows[0].id}
 }
-
 const loginUser = async (username, password) => {
     const queryString = `
         SELECT * FROM public.user
@@ -72,7 +71,6 @@ const loginUser = async (username, password) => {
         return {error: true, message: err}
     }
 }
-
 const addEvent = async (event) => {
     const queryString = `
     INSERT INTO event
@@ -84,17 +82,17 @@ const addEvent = async (event) => {
     try {
         result = await db.query(queryString, parameters)
     } catch (err) {
-        console.log("ERROR:",err.message)
+        console.log("ERROR:", err.message)
         return {error: true, message: err.error}
     }
     return {
         error: false
     }
 }
-
 const listEvents = async () => {
     const queryString = `
     SELECT * FROM event
+    ORDER BY id;
     `
     let result
     try {
@@ -116,7 +114,6 @@ const listEvents = async () => {
             }))
     }
 }
-
 const verifyUser = async (userId) => {
     const queryString = `
     UPDATE public.user
@@ -131,11 +128,101 @@ const verifyUser = async (userId) => {
         console.log(err)
         return {error: true, message: err.error}
     }
-    return {
-        error: false
+    return {error: false}
+
+}
+const signUpToEvent = async (eventId, userId) => {
+    const queryString = `
+    INSERT INTO event_user
+    (event_id, user_id)
+    VALUES ($1, $2);
+    `
+    const parameters = [eventId, userId]
+    let result;
+
+    try {
+        result = await db.query(queryString, parameters)
+    } catch (err) {
+        return {error: true, message: err.error}
+    }
+    return {error: false}
+}
+const getEventParticipants = async (eventId) => {
+    const queryString = `
+    SELECT participants 
+    FROM event
+    WHERE id=$1;
+    `
+    const parameters = [eventId]
+    let result
+
+    try {
+        result = await db.query(queryString, parameters)
+    } catch (err) {
+        return {error: true, message: err.message}
     }
 
+    return {error: false, data: result.rows[0]}
+}
+const setEventParticipants = async (eventId, participants) => {
+    const queryString = `
+    UPDATE event
+    SET participants = $2
+    WHERE id = $1;
+    `
+    const parameters = [eventId, participants]
+    let result
+
+    try {
+        result = await db.query(queryString, parameters)
+    } catch (err) {
+        return {error: true, message: err.error}
+    }
+    return {error: false}
+}
+const checkIfAlreadySigned = async (eventId, userId) => {
+    const queryString = `
+    SELECT * 
+    FROM event_user
+    WHERE event_id = $1 AND user_id = $2;
+    `
+    const parameters = [eventId, userId]
+    let result
+
+    try {
+        result = await db.query(queryString, parameters)
+    } catch (err) {
+        return {error: true, message: err.message}
+    }
+
+    return {error: result.rows.length > 0}
+}
+const deleteEvent = async (eventId) => {
+    const queryString = `
+    DELETE FROM event
+    WHERE id=$1;
+    `
+    const parameters = [eventId]
+    let result
+
+    try {
+        result = await db.query(queryString, parameters)
+    } catch (err) {
+        return {error: true, message: err.message}
+    }
+    return {error: false}
 }
 
 
-module.exports = {registerUser, loginUser, verifyUser, addEvent, listEvents}
+module.exports = {
+    registerUser,
+    loginUser,
+    verifyUser,
+    addEvent,
+    listEvents,
+    signUpToEvent,
+    getEventParticipants,
+    setEventParticipants,
+    checkIfAlreadySigned,
+    deleteEvent
+}

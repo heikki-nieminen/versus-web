@@ -32,6 +32,21 @@ export const Events = () => {
         fetchData()
     }, [])
 
+    const handleDelete = async (e)=> {
+        try {
+            const result = await axios({
+                method: 'delete',
+                url: state.apiServer + 'delete_event/' + e.target.id
+            })
+        } catch (err) {
+            console.log("ERROR:",err.message)
+        }
+        console.log()
+        const tempEvents = events.filter((event) => event.id !== Number(e.target.id))
+        setEvents(tempEvents)
+        dispatch({type: "SET_EVENTS", payload: tempEvents})
+    }
+
     return (<div>
         {isLoaded && !loading ? <Box sx={{my: 4}}>
             <ContentPaper>
@@ -52,8 +67,8 @@ export const Events = () => {
                                 </Link>
                             </Tooltip>
                             {state.isAdmin && <Box>
-                                <Button variant={"contained"}>Muokkaa</Button>
-                                <Button variant={"contained"} sx={{ml: 2}}>Poista</Button>
+                                <Button id={event.id} variant={"contained"}>Muokkaa</Button>
+                                <Button id={event.id} variant={"contained"} sx={{ml: 2}} onClick={handleDelete}>Poista</Button>
                             </Box>}
                         </Box>)
                 })}

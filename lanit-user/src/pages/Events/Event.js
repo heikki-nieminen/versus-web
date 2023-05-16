@@ -14,6 +14,18 @@ export const Event = () => {
 
     let [searchParams] = useSearchParams()
 
+
+    // TODO
+    /*
+    * Check if user has already signed to event.
+    * Show address and other additional info if user has signed
+    * Show payment info(button??) if user hasn't paid, but has signed
+    * Add resign button for user, also confirmation for that
+    *
+    *
+    *
+    * */
+
     const signUpHandler = () => {
         setOpenSignUp(true)
     }
@@ -44,7 +56,7 @@ export const Event = () => {
                     <Button variant={"contained"} onClick={signUpHandler}>Ilmoittaudu</Button>
                     </Box>
                 </Paper>
-                <SignUp open={openSignUp} setOpen={setOpenSignUp}/>
+                <SignUp open={openSignUp} setOpen={setOpenSignUp} eventId={event.id}/>
             </Box>}
     </div>)
 }

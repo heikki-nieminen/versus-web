@@ -1,7 +1,11 @@
 import {Box, Button, Modal, Typography} from "@mui/material";
+import {useContext} from "react";
+import StateContext from "../../context/StateContext";
+import axios from "axios";
 
 export const SignUp = (props) => {
-    const {open, setOpen} = props
+    const {open, setOpen, eventId} = props
+    const [state, dispatch] = useContext(StateContext)
     const style = {
         position: 'relative',
         top: '50%',
@@ -21,11 +25,15 @@ export const SignUp = (props) => {
         setOpen(false)
     }
 
-    const handleAcceptClick = () => {
+    const handleAcceptClick = async () => {
         try{
-
+            const result = await axios({
+                method: 'post',
+                url: state.apiServer + 'signup_event',
+                data: {eventId: eventId}
+            })
         }catch (err){
-
+            console.log("ERROR:",err)
         }
     }
     return (<div>
