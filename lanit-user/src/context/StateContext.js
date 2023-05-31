@@ -1,8 +1,13 @@
 import {createContext, useReducer} from "react";
 import {reducer} from "../reducer";
 
+let api = "https://lanit.versus-gaming.eu/api/"
+if(process.env.NODE_ENV === 'development') {
+    api = "http://localhost:3002/"
+}
+
 export const initialState = {
-    apiServer: "http://localhost:3002/",
+    apiServer: api,
     selectedEvent: "",
     loggedIn: false,
     testidata: "testidata",
