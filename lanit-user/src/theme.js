@@ -41,6 +41,13 @@ export const lightTheme = createTheme({
             defaultProps: {
                 elevation: 8,
             }
+        },
+        MuiLink: {
+            styleOverrides: {
+                root: {
+                    textDecoration: "none",
+                }
+            }
         }
     },
 
@@ -87,6 +94,13 @@ export const darkTheme = createTheme({
                 elevation: 8
             }
         },
+        MuiLink: {
+            styleOverrides: {
+                root: {
+                    textDecoration: "none",
+                }
+            }
+        }
     },
 
 })

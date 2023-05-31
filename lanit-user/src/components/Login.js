@@ -18,7 +18,6 @@ export const Login = (props) => {
         boxShadow: 24,
         p: 4,
         borderRadius: '10px'
-
     }
 
     const navigate = useNavigate()

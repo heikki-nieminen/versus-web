@@ -3,7 +3,7 @@ const bcrypt = require('bcrypt')
 const jwt = require('jsonwebtoken')
 
 const registerUser = async (userInfo) => {
-    console.log("userInfo: ", userInfo)
+    console.log('userInfo: ', userInfo)
     const queryString = `
     INSERT INTO public.user (username, password, email, name, lastname)
     VALUES ($1, $2, $3, $4, $5)
@@ -18,10 +18,10 @@ const registerUser = async (userInfo) => {
         if (err.code === '23505') {
             return {error: true, code: 23505, constraint: err.constraint}
         }
-        console.log("TÄSSÄ VIRHE??", err)
+        console.log('TÄSSÄ VIRHE??', err)
         return {error: true, message: err.error}
     }
-    console.log("result???", result)
+    console.log('result???', result)
     return {error: false, data: result.rows[0].id}
 }
 const loginUser = async (username, password) => {
@@ -47,7 +47,7 @@ const loginUser = async (username, password) => {
                             email: result.rows[0].email,
                             name: result.rows[0].name,
                             lastname: result.rows[0].lastname
-                        }, process.env.ADMINSECRET, {algorithm: "HS256", expiresIn: "30d"})
+                        }, process.env.ADMINSECRET, {algorithm: 'HS256', expiresIn: '30d'})
                         return ({error: false, data: {token: token, isAdmin: true}})
                     } else {
                         token = jwt.sign({
@@ -56,7 +56,7 @@ const loginUser = async (username, password) => {
                             email: result.rows[0].email,
                             name: result.rows[0].name,
                             lastname: result.rows[0].lastname
-                        }, process.env.USERSECRET, {algorithm: "HS256", expiresIn: "30d"})
+                        }, process.env.USERSECRET, {algorithm: 'HS256', expiresIn: '30d'})
                         return ({error: false, data: {token: token, isAdmin: false}})
                     }
                 } else {
@@ -74,15 +74,15 @@ const loginUser = async (username, password) => {
 const addEvent = async (event) => {
     const queryString = `
     INSERT INTO event
-    (name, description, start_time, end_time, max_participants, address, account_number, account_name, fee)
-    VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9)
+    (name, description, start_time, end_time, max_participants, address, account_number, account_name, fee, phone_number)
+    VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10)
     `
-    const parameters = [event.eventName, event.description, event.startTime, event.endTime, event.maxParticipants, event.address, event.accountNumber, event.accountName, event.fee]
+    const parameters = [event.eventName, event.description, event.startTime, event.endTime, event.maxParticipants, event.address, event.accountNumber, event.accountName, event.fee, event.phoneNumber]
     let result
     try {
         result = await db.query(queryString, parameters)
     } catch (err) {
-        console.log("ERROR:", err.message)
+        console.log('ERROR:', err.message)
         return {error: true, message: err.error}
     }
     return {
@@ -110,7 +110,11 @@ const listEvents = async () => {
                 endTime: row.end_time,
                 participants: row.participants,
                 maxParticipants: row.max_participants,
-                fee: row.fee
+                fee: row.fee,
+                address: row.address,
+                accountNumber: row.account_number,
+                accountName: row.account_name,
+                phoneNumber: row.phone_number,
             }))
     }
 }
@@ -138,7 +142,7 @@ const signUpToEvent = async (eventId, userId) => {
     VALUES ($1, $2);
     `
     const parameters = [eventId, userId]
-    let result;
+    let result
 
     try {
         result = await db.query(queryString, parameters)
@@ -195,7 +199,7 @@ const checkIfAlreadySigned = async (eventId, userId) => {
         return {error: true, message: err.message}
     }
 
-    return {error: result.rows.length > 0}
+    return {error: false, data: result.rows.length > 0}
 }
 const deleteEvent = async (eventId) => {
     const queryString = `
@@ -213,6 +217,106 @@ const deleteEvent = async (eventId) => {
     return {error: false}
 }
 
+const getEventParticipantList = async (eventId) => {
+    const queryString = `
+    SELECT user_id, has_paid
+    FROM event_user
+    WHERE event_id = $1;
+    `
+    const parameters = [eventId]
+    let result
+
+    try {
+        result = await db.query(queryString, parameters)
+    } catch (err) {
+        return {error: true, message: err.message}
+    }
+    return {error: false, data: result.rows}
+}
+
+const getUserData = async (userId) => {
+    const queryString = `
+    SELECT *
+    FROM public.user
+    WHERE id = $1;
+    `
+    const parameters = [userId]
+    let result
+
+    try {
+        result = await db.query(queryString, parameters)
+    } catch (err) {
+        return {error: true, message: err.message}
+    }
+    return {error: false, data: result.rows[0]}
+}
+
+const removeUserFromEvent = async (eventId, userId) => {
+    const queryString = `
+    DELETE FROM event_user
+    WHERE event_id = $1 AND user_id = $2;
+    `
+    const parameters = [eventId, userId]
+    let result
+
+    try {
+        result = await db.query(queryString, parameters)
+    } catch (err) {
+        return {error: true, message: err.message}
+    }
+    return {error: false}
+}
+
+const hasUserPaid = async (eventId, userId) => {
+    const queryString = `
+    SELECT has_paid
+    FROM event_user
+    WHERE event_id = $1 AND user_id = $2;
+    `
+    const parameters = [eventId, userId]
+    let result
+
+    try {
+        result = await db.query(queryString, parameters)
+    } catch (err) {
+        return {error: true, message: err.message}
+    }
+    return {error: false, data: result.rows[0]}
+}
+
+const markUserAsPaid = async (eventId, userId) => {
+    const queryString = `
+    UPDATE event_user
+    SET has_paid = true
+    WHERE event_id = $1 AND user_id = $2;
+    `
+    const parameters = [eventId, userId]
+    let result
+
+    try {
+        result = await db.query(queryString, parameters)
+    } catch (err) {
+        return {error: true, message: err.message}
+    }
+    return {error: false}
+}
+
+const editEvent = async (eventInfo) => {
+    const queryString = `
+    UPDATE event
+    SET name = $1, description = $2, start_time = $3, end_time = $4, max_participants = $5, fee = $6, address = $7, account_number = $8, account_name = $9, phone_number = $10
+    WHERE id = $11;
+    `
+    const parameters = [eventInfo.name, eventInfo.description, eventInfo.startTime, eventInfo.endTime, eventInfo.maxParticipants, eventInfo.fee, eventInfo.address, eventInfo.accountNumber, eventInfo.accountName, eventInfo.phoneNumber, eventInfo.id]
+    let result
+
+    try {
+        result = await db.query(queryString, parameters)
+    } catch (err) {
+        return {error: true, message: err.message}
+    }
+    return {error: false}
+}
 
 module.exports = {
     registerUser,
@@ -224,5 +328,11 @@ module.exports = {
     getEventParticipants,
     setEventParticipants,
     checkIfAlreadySigned,
-    deleteEvent
+    deleteEvent,
+    getEventParticipantList,
+    getUserData,
+    removeUserFromEvent,
+    hasUserPaid,
+    markUserAsPaid,
+    editEvent
 }

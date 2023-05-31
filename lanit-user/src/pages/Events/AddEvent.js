@@ -5,11 +5,13 @@ import {SetDateAndTime} from "./SetDateAndTime";
 import axios from "axios";
 import StateContext from "../../context/StateContext";
 import {dateAndTimeToLocale} from "../../utils/dateAndTime";
+import {useNavigate} from "react-router-dom";
 
 export const AddEvent = () => {
     const [openSetTime, setOpenSetTime] = useState(false)
     const [startOrEndTime, setStartOrEndTime] = useState("")
     const [state, dispatch] = useContext(StateContext)
+    const navigate = useNavigate()
 
     const [eventInfo, setEventInfo] = useState({
         eventName: "",
@@ -20,7 +22,8 @@ export const AddEvent = () => {
         endTime: "",
         maxParticipants: "",
         accountName: "",
-        accountNumber: ""
+        accountNumber: "",
+        phoneNumber: "",
     })
 
     const [startEndTime, setStartEndTime] = useState({})
@@ -53,6 +56,7 @@ export const AddEvent = () => {
             console.log("ERROR:",err.message)
         }
         console.log("Tapahtuma lisätty")
+        navigate("/events")
     }
 
     return (<div>
@@ -133,6 +137,12 @@ export const AddEvent = () => {
                         value={eventInfo.accountNumber}
                         fullWidth={true}
                         placeholder={"Tilinumero"}
+                        onChange={handleChange}/>
+                    <OutlinedInput
+                        name={"phoneNumber"}
+                        value={eventInfo.phoneNumber}
+                        fullWidth={true}
+                        placeholder={"Puhelinnumero"}
                         onChange={handleChange}/>
                     <Grid container flexDirection={"row"} alignItems={"flex-start"}>
                         <Button variant={"contained"} onClick={handleAddEvent}>Lisää tapahtuma</Button>

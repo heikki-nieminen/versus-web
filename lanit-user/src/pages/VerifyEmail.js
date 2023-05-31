@@ -22,7 +22,7 @@ export const VerifyEmail = () => {
                     console.log("Tapahtui virhe vahvistettaessa käyttäjää")
                 }
             }
-
+            console.log("Vahvistetaan sähköpostia")
             verifyEmail(id)
         }
     },[])

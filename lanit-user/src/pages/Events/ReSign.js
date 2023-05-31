@@ -3,7 +3,9 @@ import {useContext} from "react";
 import StateContext from "../../context/StateContext";
 import axios from "axios";
 
-export const SignUp = (props) => {
+
+
+export const ReSign = (props) => {
     const {open, setOpen, eventId, setSigned} = props
     const [state, dispatch] = useContext(StateContext)
     const style = {
@@ -18,6 +20,7 @@ export const SignUp = (props) => {
         p: 4,
         borderRadius: '10px',
         display: 'inline-block'
+
     }
 
     const handleClose = () => {
@@ -27,26 +30,25 @@ export const SignUp = (props) => {
     const handleAcceptClick = async () => {
         try{
             const result = await axios({
-                method: 'post',
-                url: state.apiServer + 'signup_event',
-                data: {eventId: eventId}
+                method: 'delete',
+                url: state.apiServer + 'resign_from_event/' + eventId,
             })
         }catch (err){
             console.log("ERROR:",err)
         }
         setOpen(false)
-        setSigned(true)
+        setSigned(false)
     }
-    return (<div>
-        <Modal open={open}
-               onClose={handleClose}
-               aria-labelledby="modal-modal-title"
-               aria-describedby="modal-modal-description">
-            <Box sx={style}>
 
-            <Typography>
-                Haluatko varmasti ilmoittautua laneille?
-            </Typography>
+    return (
+        <Modal open={open}
+                onClose={handleClose}
+                aria-labelledby="modal-modal-title"
+                aria-describedby="modal-modal-description">
+            <Box sx={style}>
+                <Typography>
+                    Haluatko varmasti ilmoittautua laneille?
+                </Typography>
                 <Box sx={{display: "flex" ,flexDirection:"row"}}>
                     <Box sx={{width:"50%", mt:2, mr:1}}>
                         <Button fullWidth={true} variant={"contained"} onClick={handleAcceptClick}>Kyllä</Button>
@@ -57,5 +59,5 @@ export const SignUp = (props) => {
                 </Box>
             </Box>
         </Modal>
-    </div>)
+    )
 }

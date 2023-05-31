@@ -26,6 +26,7 @@ export const Navigation = () => {
         pages = [
             {label: "Etusivu", link: '/'},
             {label: "Lanit", link: 'events'},
+            {label: "Chat", link: 'chat'},
             {label: "Info", link: 'info'}
         ]
     } else {
@@ -99,7 +100,7 @@ export const Navigation = () => {
                                     component={Link}
                                     to={page.link}
                                     textAlign={"center"}
-                                    sx={{textDecoration: 'none', ":visited": {color: '#0077cc'}}}>
+                                    sx={{textDecoration: 'none'}}>
                                     {page.label}
                                 </Typography>
                             </MenuItem>))}
@@ -117,8 +118,7 @@ export const Navigation = () => {
                                     my: 2,
                                     color: 'white',
                                     display: 'block',
-                                    textDecoration: 'none',
-                                    ":visited": {color: '#0077cc'}
+                                    textDecoration: 'none'
                                 }}>
                                 {page.label}
                             </Button>

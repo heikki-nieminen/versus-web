@@ -17,7 +17,7 @@ export const Home = () => {
         <Box sx={{my: 4, height:"50vh"}}>
             <ContentPaper>
                 <Typography id="title" variant="h2" component="h1" gutterBottom sx={{textAlign: 'center'}}>Versus Gaming  ry</Typography>
-                <Typography id="content" component="p">Tekstiä</Typography>
+                <Typography id="content" component="p" ml={4}>Versus Gaming ry:n viralliset sivut. Täällä pystyt ilmoittautumaan tapahtuumin.</Typography>
             </ContentPaper>
         </Box>
     </div>)

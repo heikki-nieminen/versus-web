@@ -1,28 +1,27 @@
-import {Navigation} from "./Navigation";
-import {Home} from "./pages/Home";
-import {createContext, useContext, useEffect, useReducer, useState} from "react";
-import {Loading} from "./pages/components/Loading";
-import {reducer} from "./reducer";
-import {Context, ThemeContext} from "./context/StateContext";
-import {StateContext} from "./context/StateContext";
+import {Navigation} from './Navigation'
+import {Home} from './pages/Home'
+import {createContext, useContext, useEffect, useReducer, useState} from 'react'
+import {Loading} from './pages/components/Loading'
+import {reducer} from './reducer'
+import {Context, ThemeContext} from './context/StateContext'
+import {StateContext} from './context/StateContext'
 
-import {Container, createTheme, CssBaseline, ThemeProvider} from "@mui/material";
-import axios from "axios";
-import {Routes, Route, Outlet, BrowserRouter} from "react-router-dom";
-import {NotFound} from "./pages/NotFound";
-import {AccessDenied} from "./pages/AccessDenied";
-import {Events} from "./pages/Events/Events";
-import {Router} from "./router/Router";
-import theme, {darkTheme, lightTheme} from "./theme";
-import {LocalizationProvider} from "@mui/x-date-pickers";
-import {AdapterDayjs} from "@mui/x-date-pickers/AdapterDayjs";
+import {Container, createTheme, CssBaseline, ThemeProvider} from '@mui/material'
+import axios from 'axios'
+import {Routes, Route, Outlet, BrowserRouter} from 'react-router-dom'
+import {NotFound} from './pages/NotFound'
+import {AccessDenied} from './pages/AccessDenied'
+import {Events} from './pages/Events/Events'
+import {Router} from './router/Router'
+import theme, {darkTheme, lightTheme} from './theme'
+import {LocalizationProvider} from '@mui/x-date-pickers'
+import {AdapterDayjs} from '@mui/x-date-pickers/AdapterDayjs'
 import 'dayjs/locale/fi'
 
 export const App = (props) => {
     const [isInitialized, setIsInitialized] = useState(true)
     const [state, dispatch] = useContext(StateContext)
     const [isLoggedIn, setIsLoggedIn] = useState(state.loggedIn)
-
 
     useEffect(() => {
         const checkUserToken = async () => {
@@ -32,11 +31,11 @@ export const App = (props) => {
                 let userData
                 try {
                     userData = await axios({
-                        method: "get", url: state.apiServer + 'verifyUserToken'
+                        method: 'get', url: state.apiServer + 'verifyUserToken'
                     })
                     if (userData) {
-                        dispatch({type: "LOGIN_USER"})
-                        dispatch({type: "SET_USERDATA", payload: {userInfo: {username: userData.data.username}}})
+                        dispatch({type: 'LOGIN_USER'})
+                        dispatch({type: 'SET_USERDATA', payload: {userInfo: {username: userData.data.username}}})
                     }
                 } catch (err) {
                     localStorage.removeItem('userToken')
@@ -50,11 +49,11 @@ export const App = (props) => {
                 let userData
                 try {
                     userData = await axios({
-                        method: "get", url: state.apiServer + 'verifyAdminToken'
+                        method: 'get', url: state.apiServer + 'verifyAdminToken'
                     })
                     if (userData) {
-                        dispatch({type: "LOGIN_ADMIN"})
-                        dispatch({type: "SET_USERDATA", payload: {userInfo: {username: userData.data.username}}})
+                        dispatch({type: 'LOGIN_ADMIN'})
+                        dispatch({type: 'SET_USERDATA', payload: {userInfo: {username: userData.data.username}}})
                     }
                 } catch (err) {
                     localStorage.removeItem('adminToken')
@@ -80,7 +79,7 @@ export const App = (props) => {
 export const ContextWrapper = () => {
     return (<>
         <Context>
-            <LocalizationProvider dateAdapter={AdapterDayjs} adapterLocale={"fi"}>
+            <LocalizationProvider dateAdapter={AdapterDayjs} adapterLocale={'fi'}>
                 <DarkThemeProvider>
                     <CssBaseline/>
                     <App/>
@@ -97,8 +96,8 @@ const DarkThemeProvider = ({children}) => {
     useEffect(() => {
         if (!isInitialized) {
             const darkMode = localStorage.getItem('darkMode')
-            if (darkMode === "true") {
-                dispatch({type: "CHANGE_THEME"})
+            if (darkMode === 'true') {
+                dispatch({type: 'CHANGE_THEME'})
             }
             setIsInitialized(true)
         }
