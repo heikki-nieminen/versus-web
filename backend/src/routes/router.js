@@ -16,7 +16,14 @@ const {
     removeUserFromEvent,
     hasUserPaid,
     markUserAsPaid,
-    editEvent
+    editEvent,
+    listUsers,
+    editUserRole,
+    getRoles,
+    addRole,
+    deleteRole,
+    editRole,
+    getContents
 } = require('../queries/queries')
 const {hashPassword} = require('../utils/authentication')
 const {sendEmail} = require('../utils/email')
@@ -236,6 +243,84 @@ router.put('/edit_event', auth.adminAuth, async (req, res, next) => {
     }
 
     return res.status(200).end()
+})
+
+
+// Role related routes
+router.get('/get_roles', auth.adminAuth, async (req, res, next) => {
+    const getRolesResult = await getRoles()
+    if (getRolesResult.error) {
+        return next(getRolesResult)
+    }
+
+    return res.status(200).send(getRolesResult.data).end()
+})
+router.post('/add_role', auth.adminAuth, async (req, res, next) => {
+    const addRoleResult = await addRole(req.body.name)
+    if (addRoleResult.error) {
+        return next(addRoleResult)
+    }
+
+    return res.status(200).send(addRoleResult.data).end()
+})
+router.delete('/delete_role/:roleId', auth.adminAuth, async (req, res, next) => {
+    const deleteRoleResult = await deleteRole(req.params.roleId)
+    if (deleteRoleResult.error) {
+        return next(deleteRoleResult)
+    }
+
+    return res.status(200).end()
+})
+router.put('/edit_role', auth.adminAuth, async (req, res, next) => {
+    const editRoleResult = await editRole(req.body.roleId, req.body.roleName)
+    if (editRoleResult.error) {
+        return next(editRoleResult)
+    }
+
+    return res.status(200).end()
+})
+
+// Contents related routes
+router.get('/get_contents', auth.adminAuth, async (req, res, next) => {
+    const getContentsResult = await getContents()
+    if (getContentsResult.error) {
+        return next(getContentsResult)
+    }
+
+    return res.status(200).send(getContentsResult.data).end()
+})
+router.get('/get_content/:key', auth.adminAuth, async (req, res, next) => {
+
+})
+router.post('/add_content', auth.adminAuth, async (req, res, next) => {
+
+})
+router.delete('/delete_content/:key', auth.adminAuth, async (req, res, next) => {
+
+})
+router.put('/edit_content', auth.adminAuth, async (req, res, next) => {
+
+})
+
+// User related routes
+router.get('/get_users', auth.adminAuth, async (req, res, next) => {
+    const listUsersResult = await listUsers()
+    if (listUsersResult.error) {
+        return next(listUsersResult)
+    }
+
+    return res.status(200).send(listUsersResult.data).end()
+})
+router.put('/edit_user_role', auth.adminAuth, async (req, res, next) => {
+    const editUserRoleResult = await editUserRole(req.body.userId, req.body.roleName)
+    if (editUserRoleResult.error) {
+        return next(editUserRoleResult)
+    }
+
+    return res.status(200).end()
+})
+router.delete('/delete_user/:userId', auth.adminAuth, async (req, res, next) => {
+
 })
 
 module.exports = router

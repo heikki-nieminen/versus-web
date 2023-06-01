@@ -46,7 +46,8 @@ const loginUser = async (username, password) => {
                             username: username,
                             email: result.rows[0].email,
                             name: result.rows[0].name,
-                            lastname: result.rows[0].lastname
+                            lastname: result.rows[0].lastname,
+                            role: result.rows[0].role
                         }, process.env.ADMINSECRET, {algorithm: 'HS256', expiresIn: '30d'})
                         return ({error: false, data: {token: token, isAdmin: true}})
                     } else {
@@ -216,7 +217,6 @@ const deleteEvent = async (eventId) => {
     }
     return {error: false}
 }
-
 const getEventParticipantList = async (eventId) => {
     const queryString = `
     SELECT user_id, has_paid
@@ -233,7 +233,6 @@ const getEventParticipantList = async (eventId) => {
     }
     return {error: false, data: result.rows}
 }
-
 const getUserData = async (userId) => {
     const queryString = `
     SELECT *
@@ -250,7 +249,6 @@ const getUserData = async (userId) => {
     }
     return {error: false, data: result.rows[0]}
 }
-
 const removeUserFromEvent = async (eventId, userId) => {
     const queryString = `
     DELETE FROM event_user
@@ -266,7 +264,6 @@ const removeUserFromEvent = async (eventId, userId) => {
     }
     return {error: false}
 }
-
 const hasUserPaid = async (eventId, userId) => {
     const queryString = `
     SELECT has_paid
@@ -283,7 +280,6 @@ const hasUserPaid = async (eventId, userId) => {
     }
     return {error: false, data: result.rows[0]}
 }
-
 const markUserAsPaid = async (eventId, userId) => {
     const queryString = `
     UPDATE event_user
@@ -300,7 +296,6 @@ const markUserAsPaid = async (eventId, userId) => {
     }
     return {error: false}
 }
-
 const editEvent = async (eventInfo) => {
     const queryString = `
     UPDATE event
@@ -317,22 +312,163 @@ const editEvent = async (eventInfo) => {
     }
     return {error: false}
 }
+const listUsers = async () => {
+    const queryString = `
+    SELECT *
+    FROM public.user;
+    `
+    let result
 
-module.exports = {
-    registerUser,
-    loginUser,
-    verifyUser,
-    addEvent,
-    listEvents,
-    signUpToEvent,
-    getEventParticipants,
-    setEventParticipants,
-    checkIfAlreadySigned,
-    deleteEvent,
-    getEventParticipantList,
-    getUserData,
-    removeUserFromEvent,
-    hasUserPaid,
-    markUserAsPaid,
-    editEvent
+    try {
+        result = await db.query(queryString)
+    } catch (err) {
+        return {error: true, message: err.message}
+    }
+    return {
+        error: false, data: result.rows.map(user => (
+            {
+                id: user.id,
+                username: user.username,
+                name: user.name,
+                lastname: user.lastname,
+                email: user.email,
+                phone: user.phone,
+                address: user.address,
+                role: user.role
+            }))
+    }
 }
+const editUserRole = async (userId, role) => {
+    const queryString = `
+    UPDATE public.user
+    SET role = $1
+    WHERE id = $2;
+    `
+    const parameters = [role, userId]
+    let result
+
+    try {
+        result = await db.query(queryString, parameters)
+    } catch (err) {
+        return {error: true, message: err.message}
+    }
+    return {error: false}
+}
+const getRoles = async () => {
+    const queryString = `
+    SELECT *
+    FROM role;
+    `
+    let result
+
+    try {
+        result = await db.query(queryString)
+    } catch (err) {
+        return {error: true, message: err.message}
+    }
+
+    return {
+        error: false, data: result.rows.map(role => (
+            {
+                id: role.id,
+                name: role.name
+            }))
+    }
+}
+const addRole = async (roleName) => {
+    const queryString = `
+    INSERT INTO role (name)
+    VALUES ($1)
+    RETURNING id;
+    `
+    const parameters = [roleName]
+    let result
+
+    try {
+        result = await db.query(queryString, parameters)
+    } catch (err) {
+        return {error: true, message: err.message}
+    }
+
+    return {error: false, data: result.rows[0].id}
+}
+const deleteRole = async (roleId) => {
+    const queryString = `
+    DELETE FROM role
+    WHERE id = $1;
+    `
+    const parameters = [roleId]
+    let result
+
+    try {
+        result = await db.query(queryString, parameters)
+    } catch (err) {
+        return {error: true, message: err.message}
+    }
+
+    return {error: false}
+}
+const editRole = async (roleId, roleName) => {
+    const queryString = `
+    UPDATE role
+    SET name = $1
+    WHERE id = $2;
+    `
+    const parameters = [roleName, roleId]
+    let result
+
+    try {
+        result = await db.query(queryString, parameters)
+    } catch (err) {
+        return {error: true, message: err.message}
+    }
+
+    return {error: false}
+}
+const getContents = async () => {
+    const queryString = `
+    SELECT *
+    FROM content;
+    `
+    let result
+
+    try {
+        result = await db.query(queryString)
+    } catch (err) {
+        return {error: true, message: err.message}
+    }
+
+    return {
+        error: false, data: result.rows.map(content => (
+            {
+                key: content.key,
+                value: content.value
+            }))
+    }
+}
+
+    module.exports = {
+        registerUser,
+        loginUser,
+        verifyUser,
+        addEvent,
+        listEvents,
+        signUpToEvent,
+        getEventParticipants,
+        setEventParticipants,
+        checkIfAlreadySigned,
+        deleteEvent,
+        getEventParticipantList,
+        getUserData,
+        removeUserFromEvent,
+        hasUserPaid,
+        markUserAsPaid,
+        editEvent,
+        listUsers,
+        editUserRole,
+        getRoles,
+        addRole,
+        deleteRole,
+        editRole,
+        getContents
+    }

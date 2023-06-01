@@ -1,12 +1,11 @@
-import {AppBar, Box, Button, IconButton, Menu, MenuItem, Switch, Toolbar, Tooltip, Typography} from "@mui/material";
-import MenuIcon from '@mui/icons-material/Menu';
-import AccountCircleRoundedIcon from '@mui/icons-material/AccountCircleRounded';
-import {StateContext} from "./context/StateContext";
-import {Login} from "./components/Login";
-import {Navigate, useNavigate, Link} from "react-router-dom";
-import {useContext, useEffect, useState} from "react";
-import {Register} from "./components/Register";
-
+import {AppBar, Box, Button, IconButton, Menu, MenuItem, Switch, Toolbar, Tooltip, Typography} from '@mui/material'
+import MenuIcon from '@mui/icons-material/Menu'
+import AccountCircleRoundedIcon from '@mui/icons-material/AccountCircleRounded'
+import {StateContext} from './context/StateContext'
+import {Login} from './components/Login'
+import {Navigate, useNavigate, Link} from 'react-router-dom'
+import {useContext, useEffect, useState} from 'react'
+import {Register} from './components/Register'
 
 export const Navigation = () => {
     const [anchorElNav, setAnchorElNav] = useState(null)
@@ -22,17 +21,25 @@ export const Navigation = () => {
 
     }, [state.loggedIn])
 
-    if (state.loggedIn) {
+    if (state.isAdmin) {
         pages = [
-            {label: "Etusivu", link: '/'},
-            {label: "Lanit", link: 'events'},
-            {label: "Chat", link: 'chat'},
-            {label: "Info", link: 'info'}
+            {label: 'Etusivu', link: '/'},
+            {label: 'Lanit', link: 'events'},
+            {label: 'Chat', link: 'Chat'},
+            {label: 'Info', link: 'info'},
+            {label: 'Admin', link: 'admin'}
+        ]
+    } else if (state.loggedIn) {
+        pages = [
+            {label: 'Etusivu', link: '/'},
+            {label: 'Lanit', link: 'events'},
+            {label: 'Chat', link: 'Chat'},
+            {label: 'Info', link: 'info'}
         ]
     } else {
         pages = [
-            {label: "Etusivu", link: '/'},
-            {label: "Info", link: 'info'}
+            {label: 'Etusivu', link: '/'},
+            {label: 'Info', link: 'info'}
         ]
     }
     const handleClick = (e) => {
@@ -63,32 +70,31 @@ export const Navigation = () => {
         handleCloseUserMenu()
         localStorage.removeItem('userToken')
         localStorage.removeItem('adminToken')
-        dispatch({type: "LOGOUT"})
-        navigate("/")
+        dispatch({type: 'LOGOUT'})
+        navigate('/')
     }
-
 
     const handleDarkModeSwitch = () => {
         localStorage.setItem('darkMode', `${!state.darkMode}`)
-        dispatch({type: "CHANGE_THEME"})
+        dispatch({type: 'CHANGE_THEME'})
     }
 
     return (
         <div>
-            <AppBar color={"primary"} position={"static"}>
+            <AppBar color={'primary'} position={'static'}>
                 <Toolbar disableGutters>
                     <Box sx={{flexGrow: 1, display: {xs: 'flex', md: 'none'}}}>
                         <IconButton
-                            size={"large"}
-                            aria-label={"account"}
-                            aria-controls={"menu-appbar"}
-                            aria-haspopup={"true"}
+                            size={'large'}
+                            aria-label={'account'}
+                            aria-controls={'menu-appbar'}
+                            aria-haspopup={'true'}
                             onClick={handleClick}
-                            color={"inherit"}>
+                            color={'inherit'}>
                             <MenuIcon/>
                         </IconButton>
                         <Menu
-                            id={"menu-appbar"}
+                            id={'menu-appbar'}
                             anchorEl={anchorElNav}
                             keepMounted
                             open={Boolean(anchorElNav)}
@@ -99,7 +105,7 @@ export const Navigation = () => {
                                     key={page.label}
                                     component={Link}
                                     to={page.link}
-                                    textAlign={"center"}
+                                    textAlign={'center'}
                                     sx={{textDecoration: 'none'}}>
                                     {page.label}
                                 </Typography>
@@ -127,17 +133,17 @@ export const Navigation = () => {
                     </Box>
                     {/*Dark Mode switch*/}
                     <Switch
-                        aria-label={"Dark mode"}
+                        aria-label={'Dark mode'}
                         checked={state.darkMode}
                         onChange={handleDarkModeSwitch}/>
                     <Box sx={{flexGrow: 0}}>
-                        <Tooltip title={"Käyttäjä"}>
-                            <IconButton onClick={handleOpenUserMenu} sx={{p: 0, mx: 2}} color={"inherit"}>
+                        <Tooltip title={'Käyttäjä'}>
+                            <IconButton onClick={handleOpenUserMenu} sx={{p: 0, mx: 2}} color={'inherit'}>
                                 <AccountCircleRoundedIcon/>
                             </IconButton>
                         </Tooltip>
                         <Menu
-                            id={"menu-appbar"}
+                            id={'menu-appbar'}
                             anchorEl={anchorElUser}
                             keepMounted
                             open={Boolean(anchorElUser)}

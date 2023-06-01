@@ -12,7 +12,9 @@ import {Loading} from "../pages/components/Loading";
 import {VerifyEmail} from "../pages/VerifyEmail";
 import {AdminTest} from "../pages/AdminTest";
 import {AddEvent} from "../pages/Events/AddEvent";
-import {Chat} from "../pages/chat/Chat";
+import {Chat} from "../pages/Chat/Chat";
+import {Users} from '../pages/Admin/Users/Users'
+import {Admin} from '../pages/Admin/Admin'
 
 export const Router = () => {
 
@@ -33,8 +35,8 @@ export const Router = () => {
                         <Route path="chat" element={<Chat/>}/>
                     </Route>
                     <Route element={<AuthRoute isProtected={true} isAdminRoute={true}/>}>
-                        <Route path={"admintest"} element={<AdminTest/>}/>
                         <Route path={"add-event"} element={<AddEvent/>}/>
+                        <Route path={"admin"} element={<Admin/>}/>
                     </Route>
                     <Route path="/verify-email" element={<VerifyEmail/>}/>
                     <Route path="/verify-email/:id" element={<VerifyEmail/>}/>

@@ -1,4 +1,5 @@
 const nodemailer = require('nodemailer')
+require("dotenv").config();
 
 let config = {
     host: process.env.EMAIL_HOST,
@@ -10,7 +11,6 @@ let config = {
 }
 
 const transport = nodemailer.createTransport(config)
-
 
 //Add proper error handling
 const sendEmail = (email, subject, text) => {
